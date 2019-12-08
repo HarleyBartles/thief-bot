@@ -1,6 +1,10 @@
 const lookups = require('./lookups')
 const moment = require('moment');
 const _ = require('lodash');
+const Twit = require('twit');
+const config = require('./config.js');
+
+const T = new Twit(config);
 
 const getThreadStarter = async (tweet) => {
     const parent = await getParentTweet(tweet)
@@ -47,8 +51,8 @@ const sanitizeText = (tweet) => {
 }
 
 const getIdenticalTweets = (tweet, includeRTs) => {
-    const fromDate = moment(tweet.created_at).subtract(5, 'years').format('YYYYMMDDHHMM')
-    const toDate = moment(tweet.created_at).format('YYYYMMDDHHMM')
+    const fromDate = moment(tweet.created_at).subtract(5, 'years').format('YYYYMMDDHHmm')
+    const toDate = moment(tweet.created_at).format('YYYYMMDDHHmm')
     const searchText = sanitizeText(tweet)
 
     const searchParams = {query: `${includeRTs ? '-"RT"' : " "}${searchText}`, fromDate, toDate,  maxResults: 100 }
@@ -73,8 +77,9 @@ const getIdenticalTweets = (tweet, includeRTs) => {
         })
 };
 
-export default {
+module.exports = {
     getThreadStarter,
     getParentTweet,
-    sanitizeText,
+    getIdenticalTweets,
+    sanitizeText
 }

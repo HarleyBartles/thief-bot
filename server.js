@@ -7,7 +7,7 @@ const helpers = require('./helpers.js');
 
 const T = new Twit(config);
 
-const replyTo = (names) => names.reduce((reply, name ) => reply += `@${name} `)
+const replyTo = (names) => names.map(name => `@${name} `).join("")
 
 const server = http.createServer(function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -38,7 +38,7 @@ const mentionEvent = async (tweet) => {
     const names = tweet.entities.user_mentions.map(u => u.screen_name).filter(n => n.toLowerCase() != 'thiefdecider')
     names.push(tweet.user.screen_name)
 
-    let reply = helpers.replyTo(names)
+    let reply = replyTo(names)
 
     reply += duplicateCount === 0
         ? 'Not thief'
