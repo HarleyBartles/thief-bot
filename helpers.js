@@ -2,14 +2,14 @@ const lookups = require('./lookups')
 const moment = require('moment');
 const _ = require('lodash');
 const Twit = require('twit');
-const config = require('./config.js');
+const config = require('./altConfig.js');
 
 const T = new Twit(config);
 
 const getThreadStarter = async (tweet) => {
     const parent = await getParentTweet(tweet)
     
-    if (parent.user.screen_name.toLowerCase() == "thiefdecider")
+    if (parent.user.screen_name.toLowerCase() == config.self_user_name.toLowerCase())
         return null
 
     return parent.in_reply_to_status_id_str
