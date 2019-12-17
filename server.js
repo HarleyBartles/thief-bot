@@ -2,7 +2,7 @@
 const http = require('http');
 const port = process.env.PORT || 1337;
 const Twit = require('twit');
-const config = require('./altConfig.js');
+const config = require('./config.js');
 const helpers = require('./helpers.js');
 
 const T = new Twit(config);
