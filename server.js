@@ -22,7 +22,7 @@ mentions.on('tweet', (tweet) => mentionEvent(tweet));
 
 const mentionEvent = async (tweet) => {
     if (!tweet.in_reply_to_status_id_str)
-        return
+        return // don't do anything if the mention isn't a reply to some other tweet
 
     const original = await helpers.getThreadStarter(tweet)
 

@@ -2,7 +2,7 @@ const lookups = require('./lookups')
 const moment = require('moment');
 const _ = require('lodash');
 const Twit = require('twit');
-const config = require('./altConfig.js');
+const config = require('./config.js');
 
 const T = new Twit(config);
 
