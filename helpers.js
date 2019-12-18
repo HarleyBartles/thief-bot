@@ -50,7 +50,17 @@ const sanitizeText = (tweet) => {
     return text
 }
 
-const getIdenticalTweets = (tweet, includeRTs) => {
+const getSevenDayTweets = (searchText) => {
+    // ToDo - implement
+    const searchParams = {query: `${includeRTs ? '-"RT"' : " "}${searchText}`, fromDate, toDate,  maxResults: 100 }
+}
+
+const getThirtyDayTweets = (searchText) => {
+    // ToDo - implement
+    const searchParams = {query: `${includeRTs ? '-"RT"' : " "}${searchText}`, fromDate, toDate,  maxResults: 100 }
+}
+
+const getFullSearchTweets = (tweet, includeRTs ) => {
     const fromDate = moment(tweet.created_at).subtract(5, 'years').format('YYYYMMDDHHmm')
     const toDate = moment(tweet.created_at).format('YYYYMMDDHHmm')
     const searchText = sanitizeText(tweet)
@@ -75,6 +85,12 @@ const getIdenticalTweets = (tweet, includeRTs) => {
             console.log(err)
             return err
         })
+}
+
+const getIdenticalTweets = (tweet, includeRTs) => {
+    
+
+    return getFullSearchTweets(tweet, includeRTs)
 };
 
 module.exports = {

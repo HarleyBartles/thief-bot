@@ -21,22 +21,22 @@ const mentions = T.stream('statuses/filter', { track: `${config.self_user_name}`
 mentions.on('tweet', (tweet) => mentionEvent(tweet));
 
 const mentionEvent = async (tweet) => {
+    const names = tweet.entities.user_mentions.map(u => u.screen_name).filter(n => n.toLowerCase() != config.self_user_name.toLowerCase())
+    names.push(tweet.user.screen_name)
+
     if (!tweet.in_reply_to_status_id_str)
         return // don't do anything if the mention isn't a reply to some other tweet
 
     const original = await helpers.getThreadStarter(tweet)
 
     if (!original)
-        return
+        return // something went wrong if we don't have a tweet here
     
     const duplicateTweets = await helpers.getIdenticalTweets(original)
     const duplicateCount = parseInt(duplicateTweets.length)
 
     if (isNaN(duplicateCount))
-        return
-
-    const names = tweet.entities.user_mentions.map(u => u.screen_name).filter(n => n.toLowerCase() != config.self_user_name.toLowerCase())
-    names.push(tweet.user.screen_name)
+        return // something went wrong
 
     let reply = replyTo(names)
 
