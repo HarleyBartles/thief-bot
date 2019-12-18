@@ -50,24 +50,13 @@ const sanitizeText = (tweet) => {
     return text
 }
 
-const getSevenDayTweets = (searchText) => {
+const getSevenDayTweets = (tweet) => {
     // ToDo - implement
-    const searchParams = {query: `${includeRTs ? '-"RT"' : " "}${searchText}`, fromDate, toDate,  maxResults: 100 }
-}
-
-const getThirtyDayTweets = (searchText) => {
-    // ToDo - implement
-    const searchParams = {query: `${includeRTs ? '-"RT"' : " "}${searchText}`, fromDate, toDate,  maxResults: 100 }
-}
-
-const getFullSearchTweets = (tweet, includeRTs ) => {
-    const fromDate = moment(tweet.created_at).subtract(5, 'years').format('YYYYMMDDHHmm')
-    const toDate = moment(tweet.created_at).format('YYYYMMDDHHmm')
     const searchText = sanitizeText(tweet)
 
-    const searchParams = {query: `${includeRTs ? '-"RT"' : " "}${searchText}`, fromDate, toDate,  maxResults: 100 }
+    const searchParams = {q: `-"RT "${searchText}`, maxId: tweet.id,  count: 100 }
 
-    return T.get('https://api.twitter.com/1.1/tweets/search/fullarchive/development.json', searchParams)
+    return T.get('https://api.twitter.com/1.1/search/tweets.json', searchParams)
         .then(res => {
             let originals = res.data.results.filter(s => !s.retweeted_status)
             const retweets = res.data.results.filter(s => !!s.retweeted_status)
@@ -87,10 +76,63 @@ const getFullSearchTweets = (tweet, includeRTs ) => {
         })
 }
 
-const getIdenticalTweets = (tweet, includeRTs) => {
-    
+const getThirtyDayTweets = (searchText) => {
+    const toDate = moment(tweet.created_at).format('YYYYMMDDHHmm')
+    const searchText = sanitizeText(tweet)
 
-    return getFullSearchTweets(tweet, includeRTs)
+    const searchParams = {query: `${searchText}`, toDate,  maxResults: 100 }
+
+    return T.get('https://api.twitter.com/1.1/tweets/search/30day/development.json', searchParams)
+        .then(res => {
+            let originals = res.data.results.filter(s => !s.retweeted_status)
+            const retweets = res.data.results.filter(s => !!s.retweeted_status)
+            
+            retweets.forEach( rt => {
+                const originalIds = originals.map(o => o.id_str)
+                if (originalIds.includes(rt.retweeted_status.id_str)){
+                    originals.push(rt.retweeted_status)
+                }
+            })
+
+            return originals.filter(t => t.id_str !== tweet.id_str)
+        })
+        .catch(err => {
+            console.log(err)
+            return err
+        })
+}
+
+const getFullSearchTweets = (tweet) => {
+    const fromDate = moment(tweet.created_at).subtract(5, 'years').format('YYYYMMDDHHmm')
+    const toDate = moment(tweet.created_at).format('YYYYMMDDHHmm')
+    const searchText = sanitizeText(tweet)
+
+    const searchParams = {query: `${searchText}`, fromDate, toDate,  maxResults: 100 }
+
+    return T.get('https://api.twitter.com/1.1/tweets/search/fullarchive/development.json', searchParams)
+        .then(res => {
+            let originals = res.data.results.filter(s => !s.retweeted_status)
+
+            return originals.filter(t => t.id_str !== tweet.id_str)
+        })
+        .catch(err => {
+            console.log(err)
+            return err
+        })
+}
+
+const getIdenticalTweets = (tweet) => {
+    const sevenDayResults = getSevenDayTweets(tweet)
+
+    if (sevenDayResults.some())
+        return sevenDayResults
+
+    const thirtyDayResults = getThirtyDayTweets(tweet)
+
+    if (thirtyDayResults.some())
+        return thirtyDayResults
+
+    return getFullSearchTweets(tweet)
 };
 
 module.exports = {
