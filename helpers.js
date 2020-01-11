@@ -51,7 +51,6 @@ const sanitizeText = (tweet) => {
 }
 
 const getSevenDayTweets = (tweet) => {
-    // ToDo - implement
     const searchText = sanitizeText(tweet)
 
     const searchParams = {q: `-"RT "${searchText}`, maxId: tweet.id,  count: 100 }
@@ -76,7 +75,7 @@ const getSevenDayTweets = (tweet) => {
         })
 }
 
-const getThirtyDayTweets = (searchText) => {
+const getThirtyDayTweets = (tweet) => {
     const toDate = moment(tweet.created_at).format('YYYYMMDDHHmm')
     const searchText = sanitizeText(tweet)
 
